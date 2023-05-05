@@ -87,7 +87,7 @@ def quit() -> None:
     Перед выходом выводит на экран таблицу лидеров и задерживает ее на 7 секунд
     затем закрывает программу
     '''
-    global flag
+    # global flag
     global max_score
     screen.blit(back, (0, 0))
     records = write_record(max_score)
@@ -100,7 +100,7 @@ def quit() -> None:
     max_score = 0
     pygame.display.update()
     pygame.time.delay(7000)
-    flag = False
+    # flag = False
     pygame.quit()
     sys.exit()
 
@@ -110,8 +110,8 @@ def contin() -> None:
     Вызывается при нажатии кнопки продолжения из меню паузы
     Меняет значение флага паузы, возобнавляет фоновую музыку и делает снова видимым корзинку
     '''
-    global pause
-    pause = False
+    global flags
+    flags['pause'] = False
     pygame.mixer.music.unpause()
     baskets.sprites()[0].image.set_alpha(255)
 
@@ -121,7 +121,8 @@ def play_again()-> None:
     Вызывается при нажатии кнопки заново из меню при поражении
     Возобнавляет фоновую музыку, делает снова видимым корзинку, обновляет счет и вызывает функцию записи результата
     '''
-    global lose_sound_flag
+    global flags
+    # global lose_sound_flag
     global game_score
     global max_score
     game_score = 0
@@ -130,7 +131,7 @@ def play_again()-> None:
     baskets.sprites()[0].image.set_alpha(255)
     write_record(max_score)
     max_score = 0
-    lose_sound_flag = False
+    flags['lose_sound'] = False
 
 def start_game() -> None:
     '''
@@ -138,10 +139,10 @@ def start_game() -> None:
     Вызывается при нажатии кнопки старт из стартового меню
     Меняет значение флага старта игры
     '''
-    global start_game_fl
-    start_game_fl = True
+    global flags
+    flags['start_game'] = True
 
-# 
+
 def show_score() -> None:
     '''
     Привязанная к опции показа кол-ва баллов игрока
@@ -341,14 +342,17 @@ def pause_function(menu: object, xs: tuple or int, ys: tuple or int) -> None:
 
 # некоторые дополнительные флаги и маркеры, для более корректной работы программы
 # маркер для проигровки музыки поражения
-lose_sound_flag = False
+# lose_sound_flag = False
 # флаг для определения стоит ли игра на паузе
-pause = False
+# pause = False
 # флаг для выхода из игры, т.к. при выходе через функцию возникает ошибка
-flag = True
+# flag = True
 # флаг для начала игры, связана с функцией start_game()
-start_game_fl = False
-
+# start_game_fl = False
+flags = {'lose_sound': False,
+         'pause': False,
+         'start_game': False,
+}
 create_ball(balls)
 while True:
     clock.tick(FPS)
@@ -357,26 +361,26 @@ while True:
         # для проверки типа события используется конструкция event.type
         # pygame.QUIT - событие при нажатии красного крестика (выхода из приложения)
         if event.type == pygame.QUIT:
-            flag = False
-            if not flag:
+            # flag = False
+            # if not flag:
             # если событие сработало. Выходит из всей программы
-                write_record(max_score)
-                max_score = 0
-                pygame.quit()
-                sys.exit()
+            write_record(max_score)
+            max_score = 0
+            pygame.quit()
+            sys.exit()
         
         # при генерации события, которое мы обозначили в начале
         elif event.type == reveal_ball:
             # создаем новый объект (шар)
-            if game_score >= 0 and not pause and start_game_fl:
+            if game_score >= 0 and not flags['pause'] and flags['start_game']:
                 create_ball(balls)
         
         elif event.type == reveal_buff:
-            if game_score >= 0 and not pause and start_game_fl:
+            if game_score >= 0 and not flags['pause'] and flags['start_game']:
                 create_buff_debuff(buffs, bl.Buff, buff_surf, buff_value)
 
         elif event.type == reveal_debuff:
-            if game_score >= 0 and not pause and start_game_fl:
+            if game_score >= 0 and not flags['pause'] and flags['start_game']:
                 create_buff_debuff(debuffs, bl.DeBuff, debuff_surf, debuff_value)
 
         # меняем громкость музыки при кручении колесика мышки
@@ -390,13 +394,13 @@ while True:
         # если нажата кнопка выхода или пробела, ставит игру на паузу
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE or event.key == pygame.K_SPACE:
-                pause = True
+                flags['pause'] = True
         
     screen.blit(back, (0, 0))
     name_input.update(events)
     # если игра еще не началась
     # отрисовывает стартовое меню
-    if not start_game_fl:
+    if not flags['start_game']:
         x, y = W//2, H//2 + 100
         start_menu.draw(screen, x, y)
         screen.blit(name_input.surface, (W//2-50, H//2 - 50))
@@ -427,19 +431,19 @@ while True:
         basket.update(keys[pygame.K_LEFT], keys[pygame.K_RIGHT], W)
         baskets.draw(screen)
         
-        if pause:
+        if flags['pause']:
             xs = (W//2-100, W//2+100, W//2)
             ys = (H//2, H//2, H//2-100)
             pause_function(pause_menu, xs, ys)
                 
         if game_score < 0:
-            lose_sound_flag = True
+            flags['lose_sound'] = True
             xs = (W//2-50, W//2-50, W//2, W//2-100, W//2+100)
             ys = (H//2-200, H//2-100, H//2, H//2+75, H//2+75)
             pause_function(finish_menu, xs, ys)
             pygame.mixer.Sound.stop(sound)
 
-            if lose_sound_flag:
+            if flags['lose_sound']:
                 lose_sound.play()
             else:
                 pygame.mixer.Sound.stop(lose_sound)
