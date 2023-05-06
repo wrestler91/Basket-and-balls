@@ -87,7 +87,6 @@ def quit() -> None:
     Перед выходом выводит на экран таблицу лидеров и задерживает ее на 7 секунд
     затем закрывает программу
     '''
-    # global flag
     global max_score
     screen.blit(back, (0, 0))
     records = write_record(max_score)
@@ -100,7 +99,6 @@ def quit() -> None:
     max_score = 0
     pygame.display.update()
     pygame.time.delay(7000)
-    # flag = False
     pygame.quit()
     sys.exit()
 
@@ -122,11 +120,9 @@ def play_again()-> None:
     Возобнавляет фоновую музыку, делает снова видимым корзинку, обновляет счет и вызывает функцию записи результата
     '''
     global flags
-    # global lose_sound_flag
     global game_score
     global max_score
     game_score = 0
-    # pygame.mixer.Sound.stop(lose_sound)
     pygame.mixer.music.unpause()
     baskets.sprites()[0].image.set_alpha(255)
     write_record(max_score)
@@ -331,7 +327,6 @@ def pause_function(menu: object, xs: tuple or int, ys: tuple or int) -> None:
     baskets.sprites()[0].image.set_alpha(0)
     # прорисовывает меню
     menu.draw(screen, xs, ys)
-    # pause_options.draw(screen)
     pygame.display.update()
     # если нажата кнопка мышки и курсор на поверхности некой опции
     # то вызывается функция привязанная к этой опции
@@ -342,13 +337,6 @@ def pause_function(menu: object, xs: tuple or int, ys: tuple or int) -> None:
 
 # некоторые дополнительные флаги и маркеры, для более корректной работы программы
 # маркер для проигровки музыки поражения
-# lose_sound_flag = False
-# флаг для определения стоит ли игра на паузе
-# pause = False
-# флаг для выхода из игры, т.к. при выходе через функцию возникает ошибка
-# flag = True
-# флаг для начала игры, связана с функцией start_game()
-# start_game_fl = False
 flags = {'lose_sound': False,
          'pause': False,
          'start_game': False,
@@ -361,9 +349,6 @@ while True:
         # для проверки типа события используется конструкция event.type
         # pygame.QUIT - событие при нажатии красного крестика (выхода из приложения)
         if event.type == pygame.QUIT:
-            # flag = False
-            # if not flag:
-            # если событие сработало. Выходит из всей программы
             write_record(max_score)
             max_score = 0
             pygame.quit()
